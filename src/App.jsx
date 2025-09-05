@@ -17,22 +17,22 @@ function App() {
     if (!input.trim()) return;
 
     // Save user's message first
-    const userMessage = { title: input, body: input, sender: "user" };
+    const userMessage = { body: input, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
 
     try {
-      // POST request to jsonplaceholder
+      // POST request to API
       const response = await axios.post(
         "https://jsonplaceholder.typicode.com/posts",
         {
           title: input,
-          body: `AI Response to: ${input}`,
+          body: input,
           userId: 1,
         }
       );
 
-      // Save AI response
-      const aiMessage = { ...response.data, sender: "ai" };
+      // Save only the ID from API response
+      const aiMessage = { body: response.data.id, sender: "ai" };
       setMessages((prev) => [...prev, aiMessage]);
 
       // Clear input
@@ -48,16 +48,16 @@ function App() {
   };
 
   // Start renaming
-  const handleRename = (index, currentTitle) => {
+  const handleRename = (index, currentText) => {
     setEditIndex(index);
-    setEditValue(currentTitle);
+    setEditValue(currentText);
   };
 
   // Save rename
   const handleRenameSave = (index) => {
     setMessages((prev) =>
       prev.map((msg, i) =>
-        i === index ? { ...msg, title: editValue, body: editValue } : msg
+        i === index ? { ...msg, body: editValue } : msg
       )
     );
     setEditIndex(null);
@@ -96,15 +96,15 @@ function App() {
                 <>
                   <span>
                     {msg.sender === "user"
-                      ? `You: ${msg.title}`
-                      : `AI: ${msg.title}`}
+                      ? `You: ${msg.body}`
+                      : `AI: ${msg.body}`}
                   </span>
                   <div className="history-actions">
                     <button onClick={() => handleDelete(index)}>🗑️</button>
-                    <button onClick={() => handleRename(index, msg.title)}>
+                    <button onClick={() => handleRename(index, msg.body)}>
                       ✏️
                     </button>
-                    <button onClick={() => handleShare(msg.title)}>📤</button>
+                    <button onClick={() => handleShare(msg.body)}>📤</button>
                   </div>
                 </>
               )}
@@ -130,7 +130,7 @@ function App() {
                 className={`message ${msg.sender === "user" ? "user" : "ai"}`}
               >
                 <p>
-                  <strong>{msg.sender === "user" ? "You" : "AI"}</strong>
+                  <strong>{msg.sender === "user" ? "You" : "AI Reponse"}</strong>
                 </p>
                 <p>{msg.body}</p>
               </div>
