@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import Lottie from "lottie-react";
+import Animations from "./animations/diagram.json";
 import "./App.css";
 
 function App() {
@@ -31,8 +33,13 @@ function App() {
         }
       );
 
-      // Save only the ID from API response
-      const aiMessage = { body: response.data.id, sender: "ai" };
+      // Save only the ID and attach an image for AI response
+      const aiMessage = {
+        body: response.data.id,
+        sender: "ai",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiyaYJ6RONH5qzqetFgjRcXOLAylUKXuXD1Q&s",
+      };
+
       setMessages((prev) => [...prev, aiMessage]);
 
       // Clear input
@@ -72,6 +79,7 @@ function App() {
 
   return (
     <>
+      
       {/* Sidebar toggle */}
       <div className="hamburger" onClick={toggleSidebar}>
         ☰
@@ -118,10 +126,20 @@ function App() {
       <div className="content-area">
         {/* Show welcome only if no messages */}
         {messages.length === 0 ? (
-          <div className="content">
-            <h1>Welcome to Diagram GPT</h1>
-            <p>Create your system design with a single click</p>
+          <div className="content" style={{ display: "flex", alignItems: "center" }}>
+          {/* Left side: Text */}
+            <div>
+              <h1>Welcome to DiagramGPT</h1>
+              <p>Create your system design with a single click</p>
+            </div>
+
+            {/* Right side: Animation */}
+            <div style={{ width: "300px", height: "300px" }}>
+              <Lottie animationData={Animations} loop={true} />
+            </div>
           </div>
+          
+
         ) : (
           <div className="messages-box">
             {messages.map((msg, index) => (
@@ -130,9 +148,17 @@ function App() {
                 className={`message ${msg.sender === "user" ? "user" : "ai"}`}
               >
                 <p>
-                  <strong>{msg.sender === "user" ? "You" : "AI Reponse"}</strong>
+                  <strong>{msg.sender === "user" ? "You" : "AI Response"}</strong>
                 </p>
                 <p>{msg.body}</p>
+                {/* Show image only if AI sent it */}
+                {msg.sender === "ai" && msg.image && (
+                  <img
+                    src={msg.image}
+                    alt="AI response"
+                    style={{ width: "200px", marginTop: "10px", borderRadius: "8px" }}
+                  />
+                )}
               </div>
             ))}
           </div>
